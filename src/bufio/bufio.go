@@ -314,6 +314,9 @@ func (b *Reader) UnreadRune() error {
 // Buffered returns the number of bytes that can be read from the current buffer.
 func (b *Reader) Buffered() int { return b.w - b.r }
 
+// ReadBuffer returns the bytes that can be read from the current buffer.
+func (b *Reader) ReadBuffer() []byte { return b.buf[b.r:b.w] }
+
 // ReadSlice reads until the first occurrence of delim in the input,
 // returning a slice pointing at the bytes in the buffer.
 // The bytes stop being valid at the next read.

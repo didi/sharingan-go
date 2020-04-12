@@ -25,6 +25,7 @@ import (
 	"net/url"
 	"os"
 	"reflect"
+	"runtime"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -363,6 +364,8 @@ type transportRequest struct {
 	extra    Header                 // extra headers to write, or nil
 	trace    *httptrace.ClientTrace // optional
 
+	delegatedFromGoid int64 // goroutineID which delegate from
+
 	mu  sync.Mutex // guards err
 	err error      // first setError value for mapRoundTripError to consider
 }
@@ -453,7 +456,7 @@ func (t *Transport) roundTrip(req *Request) (*Response, error) {
 		}
 
 		// treq gets modified by roundTrip, so we need to recreate for each retry.
-		treq := &transportRequest{Request: req, trace: trace}
+		treq := &transportRequest{Request: req, trace: trace, delegatedFromGoid: runtime.GetCurrentGoRoutineId()}
 		cm, err := t.connectMethodForRequest(treq)
 		if err != nil {
 			req.closeBody()
@@ -1677,7 +1680,10 @@ func (pc *persistConn) readLoop() {
 	alive := true
 	for alive {
 		pc.readLimit = pc.maxHeaderResponseSize()
+		// discard record
+		runtime.SetDelegatedFromGoRoutineId(-1)
 		_, err := pc.br.Peek(1)
+		runtime.SetDelegatedFromGoRoutineId(0)
 
 		pc.mu.Lock()
 		if pc.numExpectedResponses == 0 {
@@ -1689,6 +1695,13 @@ func (pc *persistConn) readLoop() {
 
 		rc := <-pc.reqch
 		trace := httptrace.ContextClientTrace(rc.req.Context())
+
+		// recording, outbound OnRead()
+		if pc.br.Buffered() > 0 {
+			runtime.SetDelegatedFromGoRoutineId(rc.delegatedFromGoid)
+			net.ReadRecord(pc.conn, pc.br.ReadBuffer(), pc.br.Buffered())
+			runtime.SetDelegatedFromGoRoutineId(0)
+		}
 
 		var resp *Response
 		if err == nil {
@@ -1978,6 +1991,7 @@ func (pc *persistConn) writeLoop() {
 	for {
 		select {
 		case wr := <-pc.writech:
+			runtime.SetDelegatedFromGoRoutineId(wr.req.delegatedFromGoid)
 			startBytesWritten := pc.nwrite
 			err := wr.req.Request.write(pc.bw, pc.isProxy, wr.req.extra, pc.waitForContinue(wr.continueCh))
 			if bre, ok := err.(requestBodyReadError); ok {
@@ -2004,8 +2018,10 @@ func (pc *persistConn) writeLoop() {
 			wr.ch <- err         // to the roundTrip function
 			if err != nil {
 				pc.close(err)
+				runtime.SetDelegatedFromGoRoutineId(0)
 				return
 			}
+			runtime.SetDelegatedFromGoRoutineId(0)
 		case <-pc.closech:
 			return
 		}
@@ -2068,6 +2084,8 @@ type requestAndChan struct {
 	continueCh chan<- struct{}
 
 	callerGone <-chan struct{} // closed when roundTrip caller has returned
+
+	delegatedFromGoid int64 // goroutineID which delegate from
 }
 
 // A writeRequest is sent by the readLoop's goroutine to the
@@ -2185,6 +2203,8 @@ func (pc *persistConn) roundTrip(req *transportRequest) (resp *Response, err err
 		addedGzip:  requestedGzip,
 		continueCh: continueCh,
 		callerGone: gone,
+
+		delegatedFromGoid: req.delegatedFromGoid,
 	}
 
 	var respHeaderTimer <-chan time.Time
