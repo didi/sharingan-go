@@ -446,7 +446,8 @@ type g struct {
 	// scan work. We track this in bytes to make it fast to update
 	// and check for debt in the malloc hot path. The assist ratio
 	// determines how this corresponds to scan work debt.
-	gcAssistBytes int64
+	gcAssistBytes     int64
+	delegatedFromGoid int64 // goroutineID which delegate from
 }
 
 type m struct {

@@ -190,6 +190,10 @@ func (c *TCPConn) SetNoDelay(noDelay bool) error {
 	return nil
 }
 
+func (c *TCPConn) Write(b []byte) (int, error) {
+	return c.conn.Write(b)
+}
+
 func newTCPConn(fd *netFD) *TCPConn {
 	c := &TCPConn{conn{fd}}
 	setNoDelay(c.fd, true)
