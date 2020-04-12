@@ -84,6 +84,7 @@ import (
 	"internal/poll"
 	"io"
 	"os"
+	"runtime"
 	"syscall"
 	"time"
 )
@@ -164,9 +165,29 @@ type conn struct {
 	fd *netFD
 }
 
-func (c *conn) ok() bool { return c != nil && c.fd != nil }
+func (c *conn) ok() bool      { return c != nil && c.fd != nil }
+func (c *conn) getFD() *netFD { return c.fd }
+func (c *conn) GetSysFD() int { return c.fd.pfd.Sysfd }
+
+// recordFD get fd for record
+type recordFD interface {
+	ok() bool
+	getFD() *netFD
+}
+
+// ReadRecord recorder Read bytes
+func ReadRecord(cc Conn, b []byte, n int) {
+	if c, ok := cc.(recordFD); ok && c.ok() {
+		fd := c.getFD()
+		OnRead(fd.pfd.Sysfd, fd.net, fd.raddr, b[:n])
+	}
+}
 
 // Implementation of the Conn interface.
+
+// OnRead Read hook
+var OnRead = func(fd int, net string, raddr Addr, span []byte) {
+}
 
 // Read implements the Conn Read method.
 func (c *conn) Read(b []byte) (int, error) {
@@ -177,7 +198,26 @@ func (c *conn) Read(b []byte) (int, error) {
 	if err != nil && err != io.EOF {
 		err = &OpError{Op: "read", Net: c.fd.net, Source: c.fd.laddr, Addr: c.fd.raddr, Err: err}
 	}
+	if n > 0 && runtime.GetCurrentGoRoutineId() != -1 {
+		OnRead(c.fd.pfd.Sysfd, c.fd.net, c.fd.raddr, b[:n])
+	}
 	return n, err
+}
+
+// Read2 copy from conn.Read, only use by replayer
+func (c *conn) Read2(b []byte) (int, error) {
+	if !c.ok() {
+		return 0, syscall.EINVAL
+	}
+	n, err := c.fd.Read(b)
+	if err != nil && err != io.EOF {
+		err = &OpError{Op: "read", Net: c.fd.net, Source: c.fd.laddr, Addr: c.fd.raddr, Err: err}
+	}
+	return n, err
+}
+
+// OnWrite Write hook
+var OnWrite = func(fd int, net string, raddr Addr, span []byte) {
 }
 
 // Write implements the Conn Write method.
@@ -185,6 +225,12 @@ func (c *conn) Write(b []byte) (int, error) {
 	if !c.ok() {
 		return 0, syscall.EINVAL
 	}
+
+	// warn: if err != nil eg: write: broken pipe, len(b) != n, very few case
+	if len(b) > 0 && runtime.GetCurrentGoRoutineId() != -1 {
+		OnWrite(c.fd.pfd.Sysfd, c.fd.net, c.fd.raddr, b)
+	}
+
 	n, err := c.fd.Write(b)
 	if err != nil {
 		err = &OpError{Op: "write", Net: c.fd.net, Source: c.fd.laddr, Addr: c.fd.raddr, Err: err}
@@ -192,11 +238,29 @@ func (c *conn) Write(b []byte) (int, error) {
 	return n, err
 }
 
+// Write2 copy from conn.Write, only use by replayer
+func (c *conn) Write2(b []byte) (int, error) {
+	if !c.ok() {
+		return 0, syscall.EINVAL
+	}
+
+	n, err := c.fd.Write(b)
+	if err != nil {
+		err = &OpError{Op: "write", Net: c.fd.net, Source: c.fd.laddr, Addr: c.fd.raddr, Err: err}
+	}
+	return n, err
+}
+
+// OnClose Close hook
+var OnClose = func(fd int) {
+}
+
 // Close closes the connection.
 func (c *conn) Close() error {
 	if !c.ok() {
 		return syscall.EINVAL
 	}
+	OnClose(c.fd.pfd.Sysfd)
 	err := c.fd.Close()
 	if err != nil {
 		err = &OpError{Op: "close", Net: c.fd.net, Source: c.fd.laddr, Addr: c.fd.raddr, Err: err}

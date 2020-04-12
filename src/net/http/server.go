@@ -665,7 +665,10 @@ func (cr *connReader) startBackgroundRead() {
 }
 
 func (cr *connReader) backgroundRead() {
+	// discard byteBuf record
+	runtime.SetDelegatedFromGoRoutineId(-1)
 	n, err := cr.conn.rwc.Read(cr.byteBuf[:])
+	runtime.SetDelegatedFromGoRoutineId(0)
 	cr.lock()
 	if n == 1 {
 		cr.hasByte = true
@@ -755,6 +758,8 @@ func (cr *connReader) Read(p []byte) (n int, err error) {
 	}
 	if cr.hasByte {
 		p[0] = cr.byteBuf[0]
+		// recovery byteBuf record
+		net.ReadRecord(cr.conn.rwc, cr.byteBuf[:], 1)
 		cr.hasByte = false
 		cr.unlock()
 		return 1, nil
@@ -3133,7 +3138,9 @@ func (h *timeoutHandler) ServeHTTP(w ResponseWriter, r *Request) {
 		h: make(Header),
 	}
 	panicChan := make(chan interface{}, 1)
-	go func() {
+	go func(delegatedID int64) {
+		runtime.SetDelegatedFromGoRoutineId(delegatedID)
+		defer runtime.SetDelegatedFromGoRoutineId(0)
 		defer func() {
 			if p := recover(); p != nil {
 				panicChan <- p
@@ -3141,7 +3148,7 @@ func (h *timeoutHandler) ServeHTTP(w ResponseWriter, r *Request) {
 		}()
 		h.handler.ServeHTTP(tw, r)
 		close(done)
-	}()
+	}(runtime.GetCurrentGoRoutineId())
 	select {
 	case p := <-panicChan:
 		panic(p)

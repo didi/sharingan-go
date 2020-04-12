@@ -15,6 +15,8 @@ pkg archive/zip, type FileHeader struct, Modified time.Time
 pkg archive/zip, type FileHeader struct, NonUTF8 bool
 pkg bufio, method (*Reader) Size() int
 pkg bufio, method (*Writer) Size() int
+pkg bufio, method (*Reader) ReadBuffer() []uint8
+pkg bufio, method (ReadWriter) ReadBuffer() []uint8
 pkg crypto/tls, const ECDSAWithSHA1 = 515
 pkg crypto/tls, const ECDSAWithSHA1 SignatureScheme
 pkg crypto/x509, const CANotAuthorizedForExtKeyUsage = 9
@@ -586,6 +588,22 @@ pkg math/rand, method (*Rand) Shuffle(int, func(int, int))
 pkg net, method (*TCPListener) SyscallConn() (syscall.RawConn, error)
 pkg net, method (*UnixListener) SyscallConn() (syscall.RawConn, error)
 pkg net/smtp, method (*Client) Noop() error
+pkg net, var OnClose func(int)
+pkg net, func ReadRecord(Conn, []uint8, int)
+pkg net, var OnRead func(int, string, Addr, []uint8)
+pkg net, var OnWrite func(int, string, Addr, []uint8)
+pkg net, method (*IPConn) GetSysFD() int
+pkg net, method (*IPConn) Read2([]uint8) (int, error)
+pkg net, method (*IPConn) Write2([]uint8) (int, error)
+pkg net, method (*TCPConn) GetSysFD() int
+pkg net, method (*TCPConn) Read2([]uint8) (int, error)
+pkg net, method (*TCPConn) Write2([]uint8) (int, error)
+pkg net, method (*UDPConn) GetSysFD() int
+pkg net, method (*UDPConn) Read2([]uint8) (int, error)
+pkg net, method (*UDPConn) Write2([]uint8) (int, error)
+pkg net, method (*UnixConn) GetSysFD() int
+pkg net, method (*UnixConn) Read2([]uint8) (int, error)
+pkg net, method (*UnixConn) Write2([]uint8) (int, error)
 pkg os, func IsTimeout(error) bool
 pkg os, method (*File) SetDeadline(time.Time) error
 pkg os, method (*File) SetReadDeadline(time.Time) error
@@ -593,6 +611,10 @@ pkg os, method (*File) SetWriteDeadline(time.Time) error
 pkg os, method (*PathError) Timeout() bool
 pkg os, method (*SyscallError) Timeout() bool
 pkg os, var ErrNoDeadline error
+pkg runtime, func GetGoRoutineId() int64
+pkg runtime, func GetCurrentGoRoutineId() int64
+pkg runtime, func SetDelegatedFromGoRoutineId(int64)
+pkg runtime, var OnGoRoutineExit func(int64)
 pkg strings, method (*Builder) Grow(int)
 pkg strings, method (*Builder) Len() int
 pkg strings, method (*Builder) Reset()
@@ -618,7 +640,112 @@ pkg syscall (windows-386), func CreateProcessAsUser(Token, *uint16, *uint16, *Se
 pkg syscall (windows-386), type SysProcAttr struct, Token Token
 pkg syscall (windows-amd64), func CreateProcessAsUser(Token, *uint16, *uint16, *SecurityAttributes, *SecurityAttributes, bool, uint32, *uint16, *uint16, *StartupInfo, *ProcessInformation) error
 pkg syscall (windows-amd64), type SysProcAttr struct, Token Token
+pkg syscall (darwin-386), var OnAccept func(int, int, Sockaddr)
+pkg syscall (darwin-386), var OnBind func(int, Sockaddr)
+pkg syscall (darwin-386), var OnConnect func(int, Sockaddr)
+pkg syscall (darwin-386-cgo), var OnAccept func(int, int, Sockaddr)
+pkg syscall (darwin-386-cgo), var OnBind func(int, Sockaddr)
+pkg syscall (darwin-386-cgo), var OnConnect func(int, Sockaddr)
+pkg syscall (darwin-amd64), var OnAccept func(int, int, Sockaddr)
+pkg syscall (darwin-amd64), var OnBind func(int, Sockaddr)
+pkg syscall (darwin-amd64), var OnConnect func(int, Sockaddr)
+pkg syscall (darwin-amd64-cgo), var OnAccept func(int, int, Sockaddr)
+pkg syscall (darwin-amd64-cgo), var OnBind func(int, Sockaddr)
+pkg syscall (darwin-amd64-cgo), var OnConnect func(int, Sockaddr)
+pkg syscall (freebsd-386), var OnAccept func(int, int, Sockaddr)
+pkg syscall (freebsd-386), var OnBind func(int, Sockaddr)
+pkg syscall (freebsd-386), var OnConnect func(int, Sockaddr)
+pkg syscall (freebsd-386-cgo), var OnAccept func(int, int, Sockaddr)
+pkg syscall (freebsd-386-cgo), var OnBind func(int, Sockaddr)
+pkg syscall (freebsd-386-cgo), var OnConnect func(int, Sockaddr)
+pkg syscall (freebsd-amd64), var OnAccept func(int, int, Sockaddr)
+pkg syscall (freebsd-amd64), var OnBind func(int, Sockaddr)
+pkg syscall (freebsd-amd64), var OnConnect func(int, Sockaddr)
+pkg syscall (freebsd-amd64-cgo), var OnAccept func(int, int, Sockaddr)
+pkg syscall (freebsd-amd64-cgo), var OnBind func(int, Sockaddr)
+pkg syscall (freebsd-amd64-cgo), var OnConnect func(int, Sockaddr)
+pkg syscall (freebsd-arm), var OnAccept func(int, int, Sockaddr)
+pkg syscall (freebsd-arm), var OnBind func(int, Sockaddr)
+pkg syscall (freebsd-arm), var OnConnect func(int, Sockaddr)
+pkg syscall (freebsd-arm-cgo), var OnAccept func(int, int, Sockaddr)
+pkg syscall (freebsd-arm-cgo), var OnBind func(int, Sockaddr)
+pkg syscall (freebsd-arm-cgo), var OnConnect func(int, Sockaddr)
+pkg syscall (linux-386), var OnAccept func(int, int, Sockaddr)
+pkg syscall (linux-386), var OnBind func(int, Sockaddr)
+pkg syscall (linux-386), var OnConnect func(int, Sockaddr)
+pkg syscall (linux-386-cgo), var OnAccept func(int, int, Sockaddr)
+pkg syscall (linux-386-cgo), var OnBind func(int, Sockaddr)
+pkg syscall (linux-386-cgo), var OnConnect func(int, Sockaddr)
+pkg syscall (linux-amd64), var OnAccept func(int, int, Sockaddr)
+pkg syscall (linux-amd64), var OnBind func(int, Sockaddr)
+pkg syscall (linux-amd64), var OnConnect func(int, Sockaddr)
+pkg syscall (linux-amd64-cgo), var OnAccept func(int, int, Sockaddr)
+pkg syscall (linux-amd64-cgo), var OnBind func(int, Sockaddr)
+pkg syscall (linux-amd64-cgo), var OnConnect func(int, Sockaddr)
+pkg syscall (linux-arm), var OnAccept func(int, int, Sockaddr)
+pkg syscall (linux-arm), var OnBind func(int, Sockaddr)
+pkg syscall (linux-arm), var OnConnect func(int, Sockaddr)
+pkg syscall (linux-arm-cgo), var OnAccept func(int, int, Sockaddr)
+pkg syscall (linux-arm-cgo), var OnBind func(int, Sockaddr)
+pkg syscall (linux-arm-cgo), var OnConnect func(int, Sockaddr)
+pkg syscall (netbsd-386), var OnAccept func(int, int, Sockaddr)
+pkg syscall (netbsd-386), var OnBind func(int, Sockaddr)
+pkg syscall (netbsd-386), var OnConnect func(int, Sockaddr)
+pkg syscall (netbsd-386-cgo), var OnAccept func(int, int, Sockaddr)
+pkg syscall (netbsd-386-cgo), var OnBind func(int, Sockaddr)
+pkg syscall (netbsd-386-cgo), var OnConnect func(int, Sockaddr)
+pkg syscall (netbsd-amd64), var OnAccept func(int, int, Sockaddr)
+pkg syscall (netbsd-amd64), var OnBind func(int, Sockaddr)
+pkg syscall (netbsd-amd64), var OnConnect func(int, Sockaddr)
+pkg syscall (netbsd-amd64-cgo), var OnAccept func(int, int, Sockaddr)
+pkg syscall (netbsd-amd64-cgo), var OnBind func(int, Sockaddr)
+pkg syscall (netbsd-amd64-cgo), var OnConnect func(int, Sockaddr)
+pkg syscall (netbsd-arm), var OnAccept func(int, int, Sockaddr)
+pkg syscall (netbsd-arm), var OnBind func(int, Sockaddr)
+pkg syscall (netbsd-arm), var OnConnect func(int, Sockaddr)
+pkg syscall (netbsd-arm-cgo), var OnAccept func(int, int, Sockaddr)
+pkg syscall (netbsd-arm-cgo), var OnBind func(int, Sockaddr)
+pkg syscall (netbsd-arm-cgo), var OnConnect func(int, Sockaddr)
+pkg syscall (openbsd-386), var OnAccept func(int, int, Sockaddr)
+pkg syscall (openbsd-386), var OnBind func(int, Sockaddr)
+pkg syscall (openbsd-386), var OnConnect func(int, Sockaddr)
+pkg syscall (openbsd-386-cgo), var OnAccept func(int, int, Sockaddr)
+pkg syscall (openbsd-386-cgo), var OnBind func(int, Sockaddr)
+pkg syscall (openbsd-386-cgo), var OnConnect func(int, Sockaddr)
+pkg syscall (openbsd-amd64), var OnAccept func(int, int, Sockaddr)
+pkg syscall (openbsd-amd64), var OnBind func(int, Sockaddr)
+pkg syscall (openbsd-amd64), var OnConnect func(int, Sockaddr)
+pkg syscall (openbsd-amd64-cgo), var OnAccept func(int, int, Sockaddr)
+pkg syscall (openbsd-amd64-cgo), var OnBind func(int, Sockaddr)
+pkg syscall (openbsd-amd64-cgo), var OnConnect func(int, Sockaddr)
+pkg syscall (darwin-386), func Connect2(int, Sockaddr) error
+pkg syscall (darwin-386-cgo), func Connect2(int, Sockaddr) error
+pkg syscall (darwin-amd64), func Connect2(int, Sockaddr) error
+pkg syscall (darwin-amd64-cgo), func Connect2(int, Sockaddr) error
+pkg syscall (freebsd-386), func Connect2(int, Sockaddr) error
+pkg syscall (freebsd-386-cgo), func Connect2(int, Sockaddr) error
+pkg syscall (freebsd-amd64), func Connect2(int, Sockaddr) error
+pkg syscall (freebsd-amd64-cgo), func Connect2(int, Sockaddr) error
+pkg syscall (freebsd-arm), func Connect2(int, Sockaddr) error
+pkg syscall (freebsd-arm-cgo), func Connect2(int, Sockaddr) error
+pkg syscall (linux-386), func Connect2(int, Sockaddr) error
+pkg syscall (linux-386-cgo), func Connect2(int, Sockaddr) error
+pkg syscall (linux-amd64), func Connect2(int, Sockaddr) error
+pkg syscall (linux-amd64-cgo), func Connect2(int, Sockaddr) error
+pkg syscall (linux-arm), func Connect2(int, Sockaddr) error
+pkg syscall (linux-arm-cgo), func Connect2(int, Sockaddr) error
+pkg syscall (netbsd-386), func Connect2(int, Sockaddr) error
+pkg syscall (netbsd-386-cgo), func Connect2(int, Sockaddr) error
+pkg syscall (netbsd-amd64), func Connect2(int, Sockaddr) error
+pkg syscall (netbsd-amd64-cgo), func Connect2(int, Sockaddr) error
+pkg syscall (netbsd-arm), func Connect2(int, Sockaddr) error
+pkg syscall (netbsd-arm-cgo), func Connect2(int, Sockaddr) error
+pkg syscall (openbsd-386), func Connect2(int, Sockaddr) error
+pkg syscall (openbsd-386-cgo), func Connect2(int, Sockaddr) error
+pkg syscall (openbsd-amd64), func Connect2(int, Sockaddr) error
+pkg syscall (openbsd-amd64-cgo), func Connect2(int, Sockaddr) error
 pkg time, func LoadLocationFromTZData(string, []uint8) (*Location, error)
+pkg time, func Now2() Time
 pkg unicode, const Version = "10.0.0"
 pkg unicode, var Masaram_Gondi *RangeTable
 pkg unicode, var Nushu *RangeTable
