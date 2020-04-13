@@ -41,7 +41,7 @@ if [ "$should_update" = true ] ; then
     tmp_file=${recorder_dir}.tar.gz
 
     # download
-    download_url=${GIT_URL}/releases/download/${VERSION}recorder/${file_name}.tar.gz
+    download_url=${GIT_URL}/releases/download/${VERSION}.recorder/${file_name}.tar.gz
     echo "wget ${download_url} -O ${tmp_file}"
     wget ${download_url} -O ${tmp_file}
 
