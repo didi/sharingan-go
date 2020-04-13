@@ -1,44 +1,75 @@
-# The Go Programming Language
+# golang定制版本，适合流量录制回放
 
-Go is an open source programming language that makes it easy to build simple,
-reliable, and efficient software.
+修改golang源码，Hook相关调用，并对外暴露接口，如：OnAccept、OnConnect、OnRead、OnWrite等等。
 
-![Gopher image](doc/gopher/fiveyears.jpg)
-*Gopher image by [Renee French][rf], licensed under [Creative Commons 3.0 Attributions license][cc3-by].*
+所有的源码修改都通过了golang官方的测试，详见1.3源码安装分支。「 测试方法：cd src && ./all.bash 」
 
-Our canonical Git repository is located at https://go.googlesource.com/go.
-There is a mirror of the repository at https://github.com/golang/go.
+目前支持的版本如下，不定期会同步官方最新release版本。
 
-Unless otherwise noted, the Go source files are distributed under the
-BSD-style license found in the LICENSE file.
+* go1.10【基于官方go1.10.8 源码修改】
+* go1.11【基于官方go1.11.13源码修改】
+* go1.12【基于官方go1.12.17源码修改】
+* go1.13【基于官方go1.13.9 源码修改】
+* go1.14【基于官方go1.14.1 源码修改】
 
-### Download and Install
+## 一、安装方法
 
-#### Binary Distributions
+### 1.1、脚本安装【推荐】
 
-Official binary distributions are available at https://golang.org/dl/.
+* 默认安装目录：/tmp/recorder-${GO-VERSION}，如：/tmp/recorder-go1.10。
+* 包含远程版本对比、本地自动升级等等，目前只支持linux和mac下面的64位系统。
+* /tmp是临时目录，如有需要可以cp到有权限的目录方便长期使用。
 
-After downloading a binary release, visit https://golang.org/doc/install
-or load [doc/install.html](./doc/install.html) in your web browser for installation
-instructions.
+``` bash
+## go1.10版本安装
+curl https://github.com/didichuxing/sharingan-go/raw/recorder/install/go1.10 | sh
+export GOROOT=/tmp/recorder-go1.10
+export PATH=$GOROOT/bin:$PATH
 
-#### Install From Source
+## go1.11版本安装
+curl https://github.com/didichuxing/sharingan-go/raw/recorder/install/go1.11 | sh
+export GOROOT=/tmp/recorder-go1.11
+export PATH=$GOROOT/bin:$PATH
 
-If a binary distribution is not available for your combination of
-operating system and architecture, visit
-https://golang.org/doc/install/source or load [doc/install-source.html](./doc/install-source.html)
-in your web browser for source installation instructions.
+## go1.12版本安装
+curl https://github.com/didichuxing/sharingan-go/raw/recorder/install/go1.12 | sh
+export GOROOT=/tmp/recorder-go1.12
+export PATH=$GOROOT/bin:$PATH
 
-### Contributing
+## go1.13版本安装
+curl https://github.com/didichuxing/sharingan-go/raw/recorder/install/go1.13 | sh
+export GOROOT=/tmp/recorder-go1.13
+export PATH=$GOROOT/bin:$PATH
 
-Go is the work of thousands of contributors. We appreciate your help!
+## go1.14版本安装
+curl https://github.com/didichuxing/sharingan-go/raw/recorder/install/go1.14 | sh
+export GOROOT=/tmp/recorder-go1.14
+export PATH=$GOROOT/bin:$PATH
+```
 
-To contribute, please read the contribution guidelines:
-	https://golang.org/doc/contribute.html
+### 1.2、二进制安装
 
-Note that the Go project uses the issue tracker for bug reports and
-proposals only. See https://golang.org/wiki/Questions for a list of
-places to ask questions about the Go language.
+支持的二进制安装包如下：
 
-[rf]: https://reneefrench.blogspot.com/
-[cc3-by]: https://creativecommons.org/licenses/by/3.0/
+* [go1.10.darwin-amd64.tar.gz](https://github.com/didichuxing/sharingan-go/releases/download/go1.10.recorder/go1.10.darwin-amd64.tar.gz)
+* [go1.10.linux-amd64.tar.gz](https://github.com/didichuxing/sharingan-go/releases/download/go1.10.recorder/go1.10.linux-amd64.tar.gz)
+* [go1.11.darwin-amd64.tar.gz](https://github.com/didichuxing/sharingan-go/releases/download/go1.11.recorder/go1.11.darwin-amd64.tar.gz)
+* [go1.11.linux-amd64.tar.gz](https://github.com/didichuxing/sharingan-go/releases/download/go1.11.recorder/go1.11.linux-amd64.tar.gz)
+* [go1.12.darwin-amd64.tar.gz](https://github.com/didichuxing/sharingan-go/releases/download/go1.12.recorder/go1.12.darwin-amd64.tar.gz)
+* [go1.12.linux-amd64.tar.gz](https://github.com/didichuxing/sharingan-go/releases/download/go1.12.recorder/go1.12.linux-amd64.tar.gz)
+* [go1.13.darwin-amd64.tar.gz](https://github.com/didichuxing/sharingan-go/releases/download/go1.13.recorder/go1.13.darwin-amd64.tar.gz)
+* [go1.13.linux-amd64.tar.gz](https://github.com/didichuxing/sharingan-go/releases/download/go1.13.recorder/go1.13.linux-amd64.tar.gz)
+* [go1.14.darwin-amd64.tar.gz](https://github.com/didichuxing/sharingan-go/releases/download/go1.14.recorder/go1.14.darwin-amd64.tar.gz)
+* [go1.14.linux-amd64.tar.gz](https://github.com/didichuxing/sharingan-go/releases/download/go1.14.recorder/go1.14.linux-amd64.tar.gz)
+
+### 1.3、源码安装
+
+如果以上安装方法不支持您的系统，可以考虑使用源码安装，支持的源码git分支如下：
+
+* [recorder-branch.go1.10](https://github.com/didichuxing/sharingan-go/tree/recorder-branch.go1.10) 【对应官方release-branch.go1.10】
+* [recorder-branch.go1.11](https://github.com/didichuxing/sharingan-go/tree/recorder-branch.go1.11) 【对应官方release-branch.go1.11】
+* [recorder-branch.go1.12](https://github.com/didichuxing/sharingan-go/tree/recorder-branch.go1.12) 【对应官方release-branch.go1.12】
+* [recorder-branch.go1.13](https://github.com/didichuxing/sharingan-go/tree/recorder-branch.go1.13) 【对应官方release-branch.go1.13】
+* [recorder-branch.go1.14](https://github.com/didichuxing/sharingan-go/tree/recorder-branch.go1.14) 【对应官方release-branch.go1.14】
+
+> 源码安装参考：[https://golang.org/doc/install/source](https://golang.org/doc/install/source)

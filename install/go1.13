@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# To run this shell script to set $GOROOT; First run will wait a few minutes, keep patience!
+#   `curl https://github.com/didichuxing/sharingan-go/raw/recorder/install/go1.13 | sh`
+#   `export GOROOT=/tmp/recorder-go1.13`
+#   `export PATH=${GOROOT}/bin:${PATH}`
+
+# only support amd64
+if [ `getconf LONG_BIT` != "64" ] ; then
+    echo "only support amd64"
+    exit
+fi
+
+# base set
+GIT_URL="https://github.com/didichuxing/sharingan-go"
+VERSION=go1.13
+REMOTE_VERSION="1989c0b86d5a422622782bc7792b75c54f7092af" # 每次改动需要更新
+
+# param
+uname=`uname`
+uname=`echo $uname | tr '[:upper:]' '[:lower:]'`
+file_name=${VERSION}.${uname}-amd64
+recorder_dir=/tmp/recorder-${VERSION}
+recorder_version=${recorder_dir}/VERSION-RECORDER
+should_update=true
+
+echo "======= Step1: compare ======="
+if [ -d "$recorder_dir" ] && [ -f "$recorder_version" ]; then
+    remote_version=${REMOTE_VERSION}
+    local_version=`cat ${recorder_version}`
+
+    echo "remote_version=${remote_version}, local_version=${local_version}"
+    if [ "$remote_version" = "$local_version" ]; then
+        should_update=false
+    fi
+fi
+
+if [ "$should_update" = true ] ; then
+    echo "======= Step2: download ======="
+    rm -rf ${recorder_dir} && mkdir -p ${recorder_dir}
+    tmp_file=${recorder_dir}.tar.gz
+
+    # download
+    download_url=${GIT_URL}/releases/download/${VERSION}recorder/${file_name}.tar.gz
+    echo "wget ${download_url} -O ${tmp_file}"
+    wget ${download_url} -O ${tmp_file}
+
+    # tar && set version
+    tar -xzf ${tmp_file} -C ${recorder_dir} --strip-components=1
+    echo ${REMOTE_VERSION} > ${recorder_version}
+
+    # rm
+    rm -rf ${tmp_file}
+fi
