@@ -22,27 +22,27 @@
 
 ``` bash
 ## go1.10版本安装
-curl https://github.com/didichuxing/sharingan-go/raw/recorder/install/go1.10 | sh
+curl https://raw.githubusercontent.com/didichuxing/sharingan-go/recorder/install/go1.10 | sh
 export GOROOT=/tmp/recorder-go1.10
 export PATH=$GOROOT/bin:$PATH
 
 ## go1.11版本安装
-curl https://github.com/didichuxing/sharingan-go/raw/recorder/install/go1.11 | sh
+curl https://raw.githubusercontent.com/didichuxing/sharingan-go/recorder/install/go1.11 | sh
 export GOROOT=/tmp/recorder-go1.11
 export PATH=$GOROOT/bin:$PATH
 
 ## go1.12版本安装
-curl https://github.com/didichuxing/sharingan-go/raw/recorder/install/go1.12 | sh
+curl https://raw.githubusercontent.com/didichuxing/sharingan-go/recorder/install/go1.12 | sh
 export GOROOT=/tmp/recorder-go1.12
 export PATH=$GOROOT/bin:$PATH
 
 ## go1.13版本安装
-curl https://github.com/didichuxing/sharingan-go/raw/recorder/install/go1.13 | sh
+curl https://raw.githubusercontent.com/didichuxing/sharingan-go/recorder/install/go1.13 | sh
 export GOROOT=/tmp/recorder-go1.13
 export PATH=$GOROOT/bin:$PATH
 
 ## go1.14版本安装
-curl https://github.com/didichuxing/sharingan-go/raw/recorder/install/go1.14 | sh
+curl https://raw.githubusercontent.com/didichuxing/sharingan-go/recorder/install/go1.14 | sh
 export GOROOT=/tmp/recorder-go1.14
 export PATH=$GOROOT/bin:$PATH
 ```
