@@ -19,6 +19,7 @@
 * 默认安装目录：/tmp/recorder-${GO-VERSION}，如：/tmp/recorder-go1.10。
 * 包含远程版本对比、本地自动升级等等，目前只支持linux和mac下面的64位系统。
 * /tmp是临时目录，如有需要可以cp到有权限的目录方便长期使用。
+* github国内下载不稳定，经常出现超时，可以试试访问google的方法。
 
 ``` bash
 ## go1.10版本安装
@@ -73,3 +74,9 @@ export PATH=$GOROOT/bin:$PATH
 * [recorder-branch.go1.14](https://github.com/didichuxing/sharingan-go/tree/recorder-branch.go1.14) 【对应官方release-branch.go1.14】
 
 > 源码安装参考：[https://golang.org/doc/install/source](https://golang.org/doc/install/source)
+
+## 常见问题
+
+* 1、Failed to connect to raw.githubusercontent.com port 443: Connection refused
+
+A：github国内下载不稳定，经常出现超时，可以试试访问google的方法，或者参考搞一个内网gitlab版本。
