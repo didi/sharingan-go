@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # To run this shell script to set $GOROOT; First run will wait a few minutes, keep patience!
-#   `curl https://raw.githubusercontent.com/didichuxing/sharingan-go/recorder/install/go1.11 | sh`
+#   `curl https://raw.githubusercontent.com/didi/sharingan-go/recorder/install/go1.11 | sh`
 #   `export GOROOT=/tmp/recorder-go1.11`
 #   `export PATH=${GOROOT}/bin:${PATH}`
 
@@ -12,7 +12,7 @@ if [ `getconf LONG_BIT` != "64" ] ; then
 fi
 
 # base set
-GIT_URL="https://github.com/didichuxing/sharingan-go"
+GIT_URL="https://github.com/didi/sharingan-go"
 VERSION=go1.11
 REMOTE_VERSION="e28eafc72d3457ee14498460c83c11e709609c4b" # 每次改动需要更新
 
